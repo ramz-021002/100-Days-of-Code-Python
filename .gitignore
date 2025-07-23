@@ -1,3 +1,5 @@
 .DS_STORE
 .idea
 .git
+.venv
+__pycache__
