@@ -28,7 +28,7 @@ while game_is_on:
             scoreboard.game_over()
 
     if player.is_at_finish_line():
-        player.reset()
+        player.reset_game()
         car_manager.level_up()
         scoreboard.increase_level()
         scoreboard.update_score()

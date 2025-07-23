@@ -11,13 +11,13 @@ class Player(Turtle):
         self.shape("turtle")
         self.color("black")
         self.penup()
-        self.reset()
+        self.reset_game()
         self.setheading(90)
 
     def go_up(self):
         self.forward(MOVE_DISTANCE)
 
-    def reset(self):
+    def reset_game(self):
         self.goto(STARTING_POSITION)
 
     def is_at_finish_line(self):
