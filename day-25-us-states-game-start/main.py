@@ -32,11 +32,12 @@ def update_score():
     score.hideturtle()
 
 def generate_report():
-    states_missed = []
-    for state in states:
-        if state not in guessed_states:
-            states_missed.append(state)
 
+    states_missed = [state for state in states if state not in guessed_states]
+
+    # for state in states:
+    #     if state not in guessed_states:
+    #         states_missed.append(state)
     df = pd.DataFrame(states_missed)
     df.to_csv("missed_states.csv")
 
