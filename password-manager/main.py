@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import generate_password as gen
 import pyperclip
+import json
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def password():
     password_generated = gen.generate()
@@ -9,22 +10,38 @@ def password():
     pyperclip.copy(password_generated)
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
+def dump_data(data):
+    with open('data.json', 'w') as f:
+        json.dump(data, f, indent=4)
 def save():
     website = website_entry.get()
     email = email_entry.get()
     password_text = password_entry.get()
-
+    new_data = {
+        website: {
+            "email": email,
+            "password": password_text,
+        }
+    }
     if len(website) == 0 or len(email) == 0 or len(password_text) == 0:
         messagebox.showerror(title="Error", message="Please fill all the fields")
     else:
-        is_ok = messagebox.askokcancel(title=website,message=f"Email address: {email}\n Password: {password}\n Is it Ok to save?")
-        if is_ok:
-            with open('data.txt', 'a') as f:
-                f.write(f'{website} | {email} | {password}\n')
-                website_entry.delete(0, END)
-                password_entry.delete(0, END)
+        # is_ok = messagebox.askokcancel(title=website,message=f"Email address: {email}\n Password: {password}\n Is it Ok to save?")
+        # if is_ok:
+        try:
+            with open('data.json', 'r') as f:
+                data = json.load(f)
+
+        except FileNotFoundError:
+            dump_data(new_data)
+
         else:
-            pass
+            data.update(new_data)
+            dump_data(new_data)
+        # json.load to read the contents, json.update to append the data(not overwrite), json.dump to flush the data into the file
+        finally:
+            website_entry.delete(0, END)
+            password_entry.delete(0, END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
