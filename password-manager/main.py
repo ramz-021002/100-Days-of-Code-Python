@@ -10,12 +10,14 @@ def search_details():
         website = website_entry.get()
         with open('data.json', 'r') as file:
             data = json.load(file)
-            if website in data:
-                messagebox.showinfo(title=website, message=f"Email:{data[website]['email']}\n Password:{data[website]['password']}")
-            else:
-                messagebox.showerror(title="Error", message="No details for this website exists")
     except FileNotFoundError:
         messagebox.showerror(title="Error", message="No data found")
+    else:
+        if website in data:
+            messagebox.showinfo(title=website,
+                                message=f"Email:{data[website]['email']}\n Password:{data[website]['password']}")
+        else:
+            messagebox.showerror(title="Error", message="No details for this website exists")
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def password():
