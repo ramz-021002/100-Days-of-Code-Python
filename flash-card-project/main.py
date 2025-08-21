@@ -6,9 +6,14 @@ BACKGROUND_COLOR = "#B1DDC6"
 
 word = {}
 # Reading the CSV file
-data = pandas.read_csv("./data/french_words.csv")
-#Converting Data Frame into a dictionary
-data_dict = data.to_dict(orient="records")
+try:
+    data = pandas.read_csv("./data/words_to_learn.csv")
+except FileNotFoundError:
+    original_data = pandas.read_csv("./data/french_words.csv")
+    data_dict = original_data.to_dict(orient="records")
+else:
+    #Converting Data Frame into a dictionary
+    data_dict = data.to_dict(orient="records")
 
 def flip():
     canvas.itemconfig(background_image, image=back_image)
@@ -25,6 +30,12 @@ def next_card():
     canvas.itemconfig(card_word, text=word['French'],fill='black')
     flip_timer = window.after(3000, func=flip)
 
+def is_known():
+    global data
+    data_dict.remove(word)
+    new_data = pandas.DataFrame(data_dict)
+    new_data.to_csv("./data/words_to_learn.csv", index=False)
+    next_card()
 
 # SETTING UP UI
 window = Tk()
@@ -46,7 +57,7 @@ canvas.grid(row=0,column=0,columnspan=2)
 
 
 right_image = PhotoImage(file="./images/right.png")
-right_button = Button(image=right_image, highlightthickness=0, borderwidth=0, command=next_card)
+right_button = Button(image=right_image, highlightthickness=0, borderwidth=0, command=is_known)
 right_button.grid(row=1,column=1)
 
 wrong_image = PhotoImage(file="./images/wrong.png")
