@@ -1,10 +1,14 @@
 import requests
 import datetime
 from twilio.rest import Client
+import os
+from dotenv import load_dotenv
 
-ALPHA_API_KEY = "<>"
-NEWS_API_KEY = "<>"
-start_date = datetime.date.today()
+load_dotenv()
+
+ALPHA_API_KEY = os.getenv('ALPHA_API_KEY')
+NEWS_API_KEY = os.getenv('NEWS_API_KEY')
+start_date = datetime.date.today() - datetime.timedelta(days=1)
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
 stock_parameters = {
@@ -19,9 +23,10 @@ NEWS_ENDPOINT = f"https://newsapi.org/v2/everything"
 
 def fetch_news_stock():
     news_parameters = {
-        'q': STOCK,
+        'qInTitle': STOCK,
         'from': str(start_date),
         'sortBy': 'relevancy',
+        'language': 'en',
         'apiKey': NEWS_API_KEY
     }
     news = requests.get(NEWS_ENDPOINT, params=news_parameters).json()
@@ -34,52 +39,38 @@ def fetch_news_stock():
     return titles[:3], descriptions[:3]
 
 def send_message(coded, titles, descriptions):
-    account_sid = '<>'
-    auth_token = '<>'
+    account_sid = os.getenv('account_sid')
+    auth_token = os.getenv('auth_token')
     client = Client(account_sid, auth_token)
     messages = [f"Heading: {x}\nBrief: {y}" for x, y in zip(titles, descriptions)]
     for message in messages:
         whatsapp_message = client.messages.create(
-            from_="whatsapp:TWILIO_WHATSAPP_NUMBER",
+            from_=f'whatsapp:{os.getenv('FROM')}',
             body=f"{STOCK}: {coded} \n{message}",
-            to="whatsapp:YOUR_TWILIO_VERIFIED_NUMBER"
+            to=f'whatsapp:{os.getenv('TO')}'
         )
         print(whatsapp_message.sid)
-def get_stock_price(yesterday, day_before):
-    global start_date
-    yesterday_data = 0
-    day_before_data = 0
-    if str(yesterday) not in stock_data:
-        yesterday -= datetime.timedelta(days=1)
-        day_before -= datetime.timedelta(days=1)
-        if str(day_before) not in stock_data:
-            day_before -= datetime.timedelta(days=1)
 
-    if (stock_data[str(yesterday)] is not None) and str(day_before) in stock_data :
-        yesterday_data = stock_data[str(yesterday)]['4. close']
-        day_before_data = stock_data[str(day_before)]['4. close']
-        start_date = yesterday
-        return yesterday_data, day_before_data
-    else:
-        return get_stock_price(yesterday, day_before-datetime.timedelta(days=1))
+def get_stock_price():
+    data_list = [value for (key,value) in stock_data.items()]
+    yesterday_data = data_list[0]['4. close']
+    day_before_data = data_list[1]['4. close']
+    print(yesterday_data, day_before_data)
+    return yesterday_data, day_before_data
 
 
 stock_response = requests.get(STOCK_ENDPOINT, params=stock_parameters).json()
-stock_response.raise_for_status()
-stock_data = stock_response["Time Series (Daily)"]
 
-yesterday_date = datetime.date.today() - datetime.timedelta(days=1)
-day_before_yesterday = yesterday_date - datetime.timedelta(days=1)
-yesterday_price, day_before_price = get_stock_price(yesterday_date, day_before_yesterday)
+stock_data = stock_response["Time Series (Daily)"]
+yesterday_price, day_before_price = get_stock_price()
 
 difference = abs(float(yesterday_price) - float(day_before_price))*100/float(day_before_price)
-print(difference)
 
-if difference > 5 and float(yesterday_price) > float(day_before_price):
+if difference > 1 and float(yesterday_price) > float(day_before_price):
     coded_message = f"🔺{int(difference)}"
     title, description = fetch_news_stock()
     send_message(coded_message, title, description)
-else:
+elif float(yesterday_price) < float(day_before_price):
     print("No News")
     coded_message = f"🔻{int(difference)}"
     title, description = fetch_news_stock()
