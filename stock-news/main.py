@@ -8,7 +8,7 @@ load_dotenv()
 
 ALPHA_API_KEY = os.getenv('ALPHA_API_KEY')
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
-start_date = datetime.date.today() - datetime.timedelta(days=1)
+start_date = datetime.date.today()
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
 stock_parameters = {

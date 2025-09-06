@@ -18,7 +18,6 @@ def search_details():
                                 message=f"Email:{data[website]['email']}\n Password:{data[website]['password']}")
         else:
             messagebox.showerror(title="Error", message=f"No details for {website} exists")
-
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def password():
     password_generated = gen.generate()
