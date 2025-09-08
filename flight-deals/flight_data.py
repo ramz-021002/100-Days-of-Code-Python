@@ -33,7 +33,7 @@ def find_cheapest_price(data):
             size = len(flight["itineraries"][0]["segments"])
             lowest_price = price
             origin_airport = flight["itineraries"][0]["segments"][0]["departure"]["iataCode"]
-            destination_airport = flight["itineraries"][0]["segments"][size]["arrival"]["iataCode"]
+            destination_airport = flight["itineraries"][0]["segments"][size-1]["arrival"]["iataCode"]
             out_date = flight["itineraries"][0]["segments"][0]["departure"]["at"].split("T")[0]
             return_date = flight["itineraries"][1]["segments"][0]["departure"]["at"].split("T")[0]
             cheapest_flight = FlightData(lowest_price, origin_airport, destination_airport, out_date, return_date)
