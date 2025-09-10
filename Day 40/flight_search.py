@@ -60,16 +60,20 @@ class FlightSearch:
 
         return code
 
-    def check_flights(self, origin_city_code, destination_city_code, from_time, to_time):
+    def check_flights(self, origin_city_code, destination_city_code, from_time, to_time, is_direct=True):
         # print(f"Using this token to check_flights() {self._token}")
         headers = {"Authorization": f"Bearer {self._token}"}
+        if is_direct:
+            non_stop = "true"
+        else:
+            non_stop = "false"
         query = {
             "originLocationCode": origin_city_code,
             "destinationLocationCode": destination_city_code,
             "departureDate": from_time.strftime("%Y-%m-%d"),
             "returnDate": to_time.strftime("%Y-%m-%d"),
             "adults": 1,
-            "nonStop": "true",
+            "nonStop": non_stop,
             "currencyCode": "GBP",
             "max": "10",
         }
@@ -88,5 +92,11 @@ class FlightSearch:
                   "-reference")
             print("Response body:", response.text)
             return None
+
+        data = response.json().get("data", [])
+
+        if not data and is_direct:
+            print("No direct flights found, trying connecting flights...")
+            return self.check_flights(origin_city_code, destination_city_code, from_time, to_time, is_direct=False)
 
         return response.json()
