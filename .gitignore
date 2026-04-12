@@ -2,6 +2,7 @@
 .idea
 .git
 .venv
+venv
 __pycache__
 .env
 .vscode
@@ -10,3 +11,4 @@ instance
 migrations
 *.sqlite3
 *.log
+chrome_profile
