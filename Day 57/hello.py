@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import render_template
 from datetime import datetime
-import requests
-from dotenv import load_dotenv
+import requests # type: ignore
+from dotenv import load_dotenv # type: ignore
 import os
 
 load_dotenv()
